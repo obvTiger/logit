@@ -13,12 +13,14 @@ class SocksLog {
     }
 
     /**
-     * Set up the LogIt module with the given config.
+     * Set up the SocksLog module with the given config.
      * The only supported config values are 'accessToken' and 'databaseId'.
      * @param {Object} config - The config values to set up the module with.
      */
-    async setup(config) {
+    setup(config) {
         this.config.noRemote = config.noRemote;
+        this.config.accessToken = config.accessToken;
+        this.config.kvsId = config.kvsId;
 
         if (!config.noRemote) {
             this.axiosInstance = axios.create({
@@ -28,23 +30,12 @@ class SocksLog {
                     'Content-Type': 'application/json'
                 }
             });
-
-            try {
-                await this.axiosInstance.get(`database/all/${config.kvsId}`);
-            } catch (error) {
-                this.config.noRemote = true;
-                this.log(`LogIt database invalid. Please sign up for an account at https://kvs.wireway.ch and provide your access token using .setup({ accessToken: 'your_access_token' })`, 'ERROR');
-                process.exit(1);
-            }
-            this.config.accessToken = config.accessToken;
-            this.config.kvsId = config.kvsId;
         }
     }
 
-
     client() {
         if (!this.config.accessToken || !this.config.kvsId || this.config.noRemote === false) {
-            this.error('LogIt is not configured. Please call setup() with your access token and database ID.');
+            this.error('SocksLog is not configured. Please call setup() with your access token and database ID.');
             return;
         }
         this.config.logClient = true
@@ -90,7 +81,7 @@ class SocksLog {
         const message = args.join(' ');
 
         if ((!this.config.accessToken || !this.config.kvsId) && !this.config.noRemote) {
-            console.error('LogIt is not configured. Please call setup() with your access token and database ID.');
+            console.error('SocksLog is not configured. Please call setup() with your access token and database ID.');
             return;
         }
 
@@ -101,6 +92,12 @@ class SocksLog {
         if (!this.config.noRemote && !this.config.logClient) {
             this.axiosInstance.post(`database/${this.config.kvsId}/${timeStamp}`, {
                 value: JSON.stringify({ message, level: "INFO", timeStamp })
+            }).catch(err => {
+                if (err.response && err.response.status === 404) {
+                    this.config.noRemote = true;
+                    this.error('SocksLog is not configured. Please call setup() with your access token and database ID.');
+                    process.exit(1);
+                }
             });
         }
     }
@@ -109,7 +106,7 @@ class SocksLog {
         const message = args.join(' ');
 
         if ((!this.config.accessToken || !this.config.kvsId) && !this.config.noRemote) {
-            console.error('LogIt is not configured. Please call setup() with your access token and database ID.');
+            console.error('SocksLog is not configured. Please call setup() with your access token and database ID.');
             return;
         }
 
@@ -120,6 +117,12 @@ class SocksLog {
         if (!this.config.noRemote && !this.config.logClient) {
             this.axiosInstance.post(`database/${this.config.kvsId}/${timeStamp}`, {
                 value: JSON.stringify({ message, level: "INFO", timeStamp })
+            }).catch(err => {
+                if (err.response && err.response.status === 404) {
+                    this.config.noRemote = true;
+                    this.error('SocksLog is not configured. Please call setup() with your access token and database ID.');
+                    process.exit(1);
+                }
             });
         }
     }
@@ -128,7 +131,7 @@ class SocksLog {
         const message = args.join(' ');
 
         if ((!this.config.accessToken || !this.config.kvsId) && !this.config.noRemote) {
-            console.error('LogIt is not configured. Please call setup() with your access token and database ID.');
+            console.error('SocksLog is not configured. Please call setup() with your access token and database ID.');
             return;
         }
 
@@ -139,6 +142,12 @@ class SocksLog {
         if (!this.config.noRemote && !this.config.logClient) {
             this.axiosInstance.post(`database/${this.config.kvsId}/${timeStamp}`, {
                 value: JSON.stringify({ message, level: "WARN", timeStamp })
+            }).catch(err => {
+                if (err.response && err.response.status === 404) {
+                    this.config.noRemote = true;
+                    this.error('SocksLog is not configured. Please call setup() with your access token and database ID.');
+                    process.exit(1);
+                }
             });
         }
     }
@@ -146,7 +155,7 @@ class SocksLog {
         const message = args.join(' ');
 
         if ((!this.config.accessToken || !this.config.kvsId) && !this.config.noRemote) {
-            console.error('LogIt is not configured. Please call setup() with your access token and database ID.');
+            console.error('SocksLog is not configured. Please call setup() with your access token and database ID.');
             return;
         }
 
@@ -158,6 +167,12 @@ class SocksLog {
         if (!this.config.noRemote && !this.config.logClient) {
             this.axiosInstance.post(`database/${this.config.kvsId}/${timeStamp}`, {
                 value: JSON.stringify({ message, level: "ERROR", timeStamp })
+            }).catch(err => {
+                if (err.response && err.response.status === 404) {
+                    this.config.noRemote = true;
+                    this.error('SocksLog is not configured. Please call setup() with your access token and database ID.');
+                    process.exit(1);
+                }
             });
         }
     }
