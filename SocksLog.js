@@ -33,6 +33,13 @@ class SocksLog {
         }
     }
 
+    /**
+     * Enable the client mode of SocksLog. This will open a WebSocket connection to the Key-Value-Store
+     * and log all incoming messages to the console.
+     * The messages are logged with the same log levels as the messages sent by the log, info, warn, and error
+     * methods.
+     * @throws {Error} SocksLog is not configured. Please call setup() with your access token and database ID.
+     */
     client() {
         if (!this.config.accessToken || !this.config.kvsId || this.config.noRemote === false) {
             this.error('SocksLog is not configured. Please call setup() with your access token and database ID.');
@@ -45,7 +52,6 @@ class SocksLog {
 
         const self = this;
         ws.on('open', function open() {
-            
             self.log('Connection established.');
         });
 
@@ -55,7 +61,7 @@ class SocksLog {
 
             if (event.type == "post") {
                 const data = JSON.parse(event.value);
-                const { message, level,  timeStamp} = data;
+                const { message, level, timeStamp } = data;
 
                 if (level == "ERROR") {
                     console.log('\x1b[41m%s\x1b[0m', `ERROR\x1b[0m ${timeStamp}: ${message}`);
